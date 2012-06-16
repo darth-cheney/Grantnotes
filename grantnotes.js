@@ -15,7 +15,7 @@
 
 
 
-jQuery(document).ready(function($){
+$(document).ready(function(){
 	
 	// Prototype for Footnote object
 	function fNote(ref, note_count) { // ref must be a jQuery object matching a single <sup> within the content div
@@ -28,9 +28,10 @@ jQuery(document).ready(function($){
 		this.noteID = 'foot' + this.note_count;
 
 		// construct a footnote div with the appropriate contents
-		$('#content div.footnote-bar').append('<div class="footnote" id="foot' + this.note_count + '"></div');
+		$('.entry-content div.footnote-bar').append('<div class="footnote" id="foot' + this.note_count + '"></div');
 		this.this_footnote = 'div#foot' + this.note_count + '.footnote';
-		$(this.this_footnote).append($('.entry-content span.footnote-text').filter(':first'));
+		$(this.this_footnote).append($('<sup>' + note_count + '</sup>'));
+		$(this.this_footnote).append($('.entry-content').find('span.footnote-text').filter(':first'));
 
 		// instantiate the different attributes for a footnote:
 		this.normal_pos = $(this.this_footnote).position().top;
@@ -69,6 +70,8 @@ jQuery(document).ready(function($){
 		};
 	};
 
+	var prev_bottom = 0;
+	var note_count = 0;
 	var content_height = $('article.main-article').offset().top; // IMPORTANT: change article.main-article to your own main content div
 	var noteArray = new Array(); // An array for storing the footnote objects
 	$('article.main-article p').find('sup').each(function(){ // for each found <sup>, do the following

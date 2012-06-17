@@ -18,7 +18,7 @@
 $(document).ready(function(){
 	
 	// Prototype for Footnote object
-	function fNote(ref, note_count) { // ref must be a jQuery object matching a single <sup> within the content div
+	function fNote(ref, note_count, textElem, fBar) { // ref must be a jQuery object matching a single <sup> within the content div
 		this.ref = ref;
 		this.note_count = note_count;
 
@@ -26,6 +26,16 @@ $(document).ready(function(){
 		this.refID = 'ref' + this.note_count;
 		this.ref.attr('id', this.refID);
 		this.noteID = 'foot' + this.note_count;
+
+		// Calculate and store the heights of the main-text div and the footnote sidebar div
+		this.text_offset = textElem.offset().top;
+		this.fbar_offset = fBar.offset().top;
+		this.fbar_pos = 0;
+
+		if( this.text_offset > this.fBar_offset) {
+			this.fbar_pos = this.ref.offset().top - this.fbar_offset;
+		}
+
 
 		// construct a footnote div with the appropriate contents
 		$('.entry-content div.footnote-bar').append('<div class="footnote" id="foot' + this.note_count + '"></div');
@@ -47,13 +57,13 @@ $(document).ready(function(){
 			return this.position() + this.height;
 		};
 
-		this.offPosition = function(content_height) { // returns the position as a calculation of total offset minus the content_height
+		this.offPosition = function() { // returns the position as a calculation of total offset minus the content_height
 			var offset = $(this.this_footnote).offset().top;
-			return offset - content_height;
+			return offset - this.fbar_offset;
 		};
 
-		this.offBottom = function(content_height) { // returns the bottom position of the element using the offPosition() method
-			var offPos = this.offPosition(content_height);
+		this.offBottom = function() { // returns the bottom position of the element using the offPosition() method
+			var offPos = this.offPosition();
 			return offPos + this.height;
 		};
 
@@ -61,9 +71,9 @@ $(document).ready(function(){
 			return this.position() == this.normal_pos;
 		};
 
-		this.refPosition = function(content_height) { // returns the position-top of the linked reference in the text body
+		this.refPosition = function() { // returns the position-top of the linked reference in the text body
 			var offset = $('#'+this.refID).offset().top;
-			return offset - content_height;
+			return offset - this.fbar_offset;
 		};
 
 		this.setPosition = function(num) { // sets the position-top of the given element
@@ -73,13 +83,14 @@ $(document).ready(function(){
 
 	var prev_bottom = 0;
 	var note_count = 0;
-	var content_height = $('article.main-article').offset().top; // IMPORTANT: change article.main-article to your own main content div
 	var noteArray = new Array(); // An array for storing the footnote objects
 	$('article.main-article p').find('sup').each(function(){ // for each found <sup>, do the following
 		note_count = note_count + 1;
+		var text = $('article.main-article');
+		var fBar = $('div.footnote-bar');
 
 		// instantiate a new footnote object corresponding to the located <sup>
-		var footnote = new fNote($(this), note_count);
+		var footnote = new fNote($(this), note_count, text, fBar);
 		noteArray.push(footnote); // add it to the array
 
 		$('.footnote').css('visibility', 'visible');
@@ -88,7 +99,7 @@ $(document).ready(function(){
 	// This is where the magic happens. The div.footnote elements are placed at the proper position and cased for overlaps.
 	for (var i = 0; i < noteArray.length; i++) {
 		var footnote = noteArray[i];
-		var ref_pos = footnote.refPosition(content_height);
+		var ref_pos = footnote.refPosition();
 		if(ref_pos < prev_bottom){
 			footnote.setPosition(prev_bottom - footnote.normal_pos);
 		} else {

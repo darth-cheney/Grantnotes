@@ -38,34 +38,35 @@ $(document).ready(function(){
 		this.height = $(this.this_footnote).outerHeight(true);
 		this.normal_bottom = this.normal_pos + this.height;
 
-		this.position = function() {
+		// fNote methods
+		this.position = function() { // returns the position-top relative to the nearest offset parent
 			return $(this.this_footnote).position().top;
 		};
 
-		this.bottom = function() {
+		this.bottom = function() { // returns the position of the bottom of the element (relies on this.position())
 			return this.position() + this.height;
 		};
 
-		this.offPosition = function(content_height) {
+		this.offPosition = function(content_height) { // returns the position as a calculation of total offset minus the content_height
 			var offset = $(this.this_footnote).offset().top;
 			return offset - content_height;
 		};
 
-		this.offBottom = function(content_height) {
+		this.offBottom = function(content_height) { // returns the bottom position of the element using the offPosition() method
 			var offPos = this.offPosition(content_height);
 			return offPos + this.height;
 		};
 
-		this.isNormal = function() {
+		this.isNormal = function() { // returns a boolean value of whether or not the element is in its 'normal' DOM position
 			return this.position() == this.normal_pos;
 		};
 
-		this.refPosition = function(content_height) {
+		this.refPosition = function(content_height) { // returns the position-top of the linked reference in the text body
 			var offset = $('#'+this.refID).offset().top;
 			return offset - content_height;
 		};
 
-		this.setPosition = function(num) {
+		this.setPosition = function(num) { // sets the position-top of the given element
 			$(this.this_footnote).css('top', num);
 		};
 	};

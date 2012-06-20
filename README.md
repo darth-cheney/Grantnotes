@@ -39,16 +39,16 @@ Hello, fellow footnoters. Included in this repo are the jQuery script and a very
   <h5>fNote Methods</h5>
   <ul><li><code>position()</code> -- Returns a pixel value for the current position of the top of the given <code>.footnote</code> element. Calculated using jQuery's <code>.position().top</code> method.</li>
   <li><code>bottom()</code> -- Returns the pixel value for the current position of the bottom of the given <code>.footnote</code> element. Calculated using fNote's <code>height</code> variable and <code>postiion</code> method.</li>
-  <li><code>offPosition(<i>content_height</i>)</code> -- Primarily for error checking, this method returns the position of the top of the given <code>.footnote</code>
-  element with respect to the entire document (using jQuery's <code>.offset().top</code>) then subtracts a <i>content_height</i> value,
+  <li><code>offPosition(<i></i>)</code> -- Primarily for error checking, this method returns the position of the top of the given <code>.footnote</code>
+  element with respect to the entire document (using jQuery's <code>.offset().top</code>) then subtracts a <i></i> value,
   which should be a pixel value for where the top of the content div (in the provided case it's <code>.entry-content</code>) begins with respect
   to the entire document. Useful for comparing with fNote's <code>position()</code> method, as the two should ideally be the same.</li>
-  <li><code>offBottom(<i>content_height</i>)</code> -- Similar to <code>offPosition()</code>, but returns the pixel value for the bottom of the given <code>.footnote</code> element
+  <li><code>offBottom(<i></i>)</code> -- Similar to <code>offPosition()</code>, but returns the pixel value for the bottom of the given <code>.footnote</code> element
   instead of the top</li>
   <li><code>isNormal()</code> -- Returns a boolean value to check whether or not the given <code>.footnote</code> is currently residing
   in its "normal" position within the document flow. If true, this means that no adjustments have been made to its position, and it has not
   been placed in the final (hopefully correct) position.</li>
-  <li><code>refPosition(<i>content_height</i>)</code> -- Returns a pixel value for the position of the top of the referenced <code>sup</code> element
+  <li><code>refPosition(<i></i>)</code> -- Returns a pixel value for the position of the top of the referenced <code>sup</code> element
    within that element's containing div. It takes into account the differences in height between the content div and the footnote siderbar.</li>
   <li><code>setPosition(<i>num</i>)</code> -- The method for setting the position of the top of the given <code>.footnote</code>. Makes use of jQuery's
   <code>.css()</code> method and changes the CSS value of "top".

@@ -1,55 +1,38 @@
 Grantnotes
 ==========
+Grantnotes is a simple jQuery reliant script for implementing footnotes similar to those used on Grantland.com
 
-Basic jQuery script and CSS markup for imitating the clever sidebar footnotes used on Grantland.com
-
-Hello, fellow footnoters. Included in this repo are the jQuery script and a very small stylesheet. More to come soon.
-
-<h4>Overview</h4>
-  In the simplest terms, this system requires one overarching container element and two additional elements
-  within that container: a "main content" div and a (preferably floating) "sidebar" div. The script then scans the document,
-  assigning unique ids to the "main content" notes and putting the footnoted text into the sidebar in an appropriate 
-  format. In the end, each footnote should be aligned vertically with the sentence in which the citation was made, or, if 
-  two footnotes are too long for that to be possible, they should be one on top of the other in correct order.
-  
-<h4>HTMLing a footnote</h4>
-  For this script you will need to do two things: insert a sup element in the "main content" area with whatever notation
-  you desire, then create a span of text with class ".footnote-text" that has the content of of the actual note. The
-  script will take care of creating containing footnote divs and placing the text into the "sidebar" in the proper
-  order and height levels.
-  
-<h4>The fNote Object</h4>
-  Grantnotes works by instantiating an fNote object for each sup element that it finds. Upon construction, an fNote
-  creates a new div with class ".footnote" that is placed within the sidbar for footnotes (here called "div.footnote-bar").
-  It then gives the sup element a specific id value based on the "note_count" variable that is passed to it (for example,
-   if the note_count is 6 the sup will be "sup#ref6". It then searches for the spans of text with class ".footnote-text"
-  and places them within the ".footnote" div. IMPORTANT: the "span.footnote-text" elements should be created <i>in order</i>!
-  <br/>
-  <h5>fNote Variables</h5>
-  <ul>
-  <li><code>refID</code> -- The string containing the sup element's id (without a '#').</li>
-  <li><code>noteID</code> -- Similar to <code>refID</code> but is instead the id given to the <code>.footnote</code> div.</li>
-  <li><code>note_count</code> -- This is identical to the <i>note_count</i> that is passed to the constructor.</li>
-  <li><code>normal_pos</code> -- An int of the pixel value for the top of the <code>.footnote</code> element where it would <i>normally reside within the DOM</i>. Because 
-  this script and stylesheet rely upon the <code>position: relative</code> markup, this value must be taken into account in later calculations.</li>
-  <li><code>height</code> -- The height, in pixels, of the given <code>.footnote</code> element. This is calculated using jQuery's <code>.outerHeight(true)</code> function, which includes all margins and padding.</li>
-  <li><code>normal_bottom</code> -- The pixel value of the bottom of the given <code>.footnote</code> element as it would normally reside in the DOM.</li>
-  </ul>
-  <br/>
-  <h5>fNote Methods</h5>
-  <ul><li><code>position()</code> -- Returns a pixel value for the current position of the top of the given <code>.footnote</code> element. Calculated using jQuery's <code>.position().top</code> method.</li>
-  <li><code>bottom()</code> -- Returns the pixel value for the current position of the bottom of the given <code>.footnote</code> element. Calculated using fNote's <code>height</code> variable and <code>postiion</code> method.</li>
-  <li><code>offPosition(<i></i>)</code> -- Primarily for error checking, this method returns the position of the top of the given <code>.footnote</code>
-  element with respect to the entire document (using jQuery's <code>.offset().top</code>) then subtracts a <i></i> value,
-  which should be a pixel value for where the top of the content div (in the provided case it's <code>.entry-content</code>) begins with respect
-  to the entire document. Useful for comparing with fNote's <code>position()</code> method, as the two should ideally be the same.</li>
-  <li><code>offBottom(<i></i>)</code> -- Similar to <code>offPosition()</code>, but returns the pixel value for the bottom of the given <code>.footnote</code> element
-  instead of the top</li>
-  <li><code>isNormal()</code> -- Returns a boolean value to check whether or not the given <code>.footnote</code> is currently residing
-  in its "normal" position within the document flow. If true, this means that no adjustments have been made to its position, and it has not
-  been placed in the final (hopefully correct) position.</li>
-  <li><code>refPosition(<i></i>)</code> -- Returns a pixel value for the position of the top of the referenced <code>sup</code> element
-   within that element's containing div. It takes into account the differences in height between the content div and the footnote siderbar.</li>
-  <li><code>setPosition(<i>num</i>)</code> -- The method for setting the position of the top of the given <code>.footnote</code>. Makes use of jQuery's
-  <code>.css()</code> method and changes the CSS value of "top".
-  </ul>
+<h4>How to initialize:</h4>
+Within a jQuery script, simply call the <code>grantnotes()</code> function.
+It takes 2 parameters: a <code>div</code> or <code>article</code> in which the main text appears, and a <code>div</code> for the floated sidebar in which the notes will appear. Both must be passed as jQuery objects.
+<br/>
+<br/>
+<b><u>Example:</u></b>
+<br/>
+<code>
+$(document).ready(function(){<br/>
+    grantnotes($('article.main-article'), $('.footnote-bar')); <br/>
+});
+</code>
+<br/>
+<br/>
+<b>Requirements</b><br/>
+The <code>article</code> or <code>div</code> containing the main text should have within it one or more <code>sup</code> elements. It should also 
+contain a <code>span</code> with <code>class="footnote-text"</code> for each <code>sup</code> that is found within the main text, as they are each the text that will be incorporated into the footnote. These <code>span</code>
+elements should be in order somewhere within the main text.
+<br/>
+You can include your own numbers or symbols within each <code>sup</code>, but empty elements are ok too; the script will automatically number them for you.
+<br/><br/>
+The <code>.footnote-bar</code> division should be floated to either side of the <code>article</code> or <code>div</code> containing the main text. It must also have set the markup for <code>position: relative</code> in order for the script to work properly.
+<br/>
+<br/><br/>
+<h4>What will it do?</h4>
+For each <code>sup</code> that grantnotes finds within the main text, it creates a new <code>div</code> element of <code>class="footnote</code> and places it within the <code>.footnote-bar</code> that you've already provided as a parameter. It then takes the <code>span.footnote-text</code> associated with that reference (if it has been written in order) and puts it within the newly created <code>.footnote</code> division.<br/><br/>
+Once all of the <code>.footnote</code>s are in place, the script will position each footnote so that it is horizontally aligned with the corresponding <code>sup</code> element within the main text. If two <code>sup</code> elements are close to each other in that main text, the resulting footnotes will be placed one on top of the other, sequentially, instead of being aligned horizontally with their respective note. For a better visual of this, load any of the example files provided in this repository.<br/><br/>
+All footnotes are given an <code>id</code> of <code>#foot[num]</code> where <code>[num]</code> is the order of the footnote. Again, for a better idea of how this works simply load the source for any of the example pages provided in this repository.
+<br/>
+<h4>How does it work</h4>
+Because this sort of footnoting (surprisingly) requires more JavaScript-fu than one would expect, grantnotes relies upon an <code>fNote</code> object, which contains most of the metrics and fuctions needed to render each footnote at its proper position on the page.
+<br/><br/>
+Grantnotes also makes use of a smaller <code>article</code> object, which stores metrics about the size and offset of the main-text article. One of the reasons that these objects are necessary is because the article/main-text division and the footnote-bar division need not start at the same height on the page. In other words, if one wanted to float a block of ads to the right of the main-text, and then the footnote-bar underneath those ads, grantnotes knows to take this into consideration, and will render the first footnotes underneath those ads instead of a position horizontally aligned with the actual first <code>sup</code>. The provided file <b>example2.html</b> provides a straightforward example of this.<br/><br/>
+Each <code>fNote</code> is initialized and a fresh <code>.footnote</code> element is created for each and then displayed. Each <code>fNote</code> is subsequently placed into an array and stored with all of the other <code>fNote</code> objects. The script then cycles through these, making use of specific measurement methods (which are also jQuery reliant) to ascertain the old and new positions of each element.

@@ -12,9 +12,10 @@
 // GNU General Public License for more details.
 
 
-$(document).ready(function(){
-	grantnotes($('article.main-article'), $('.footnote-bar')); // Our example call to the overall function.		
-});
+/* jQuery(document).ready(function(){
+	grantnotes(jQuery('article.main-article'), jQuery('.footnote-bar')); // Our example call to the overall function.		
+}); */
+
 
 
 // The overall script
@@ -33,16 +34,16 @@ function grantnotes(arText, footbar){
 			var note_char;
 			if(!ref.text()){
 				note_char = this.number;
-				ref.text(note_char);
 			} else {
 				note_char = ref.text();
 			};
+			ref.prepend('<a href="#' + this.noteID + '">' + note_char + '</a>');
 
 
 			// Find the footnote text and create a .footnote div
-			fBar.append($('<div class="footnote" id="' + this.noteID + '"></div>'));
-			this.element = $('div#' + this.noteID + '.footnote'); // a jQuery object representing the newly created div.footnote
-			this.element.append($('<sup>' + note_char + '</sup>'));
+			fBar.append(jQuery('<div class="footnote" id="' + this.noteID + '"></div>'));
+			this.element = jQuery('div#' + this.noteID + '.footnote'); // a jQuery object representing the newly created div.footnote
+			this.element.append(jQuery('<sup>' + note_char + '</sup>'));
 			this.element.append(arText.find('span.footnote-text').filter(':first'));
 
 			// Now that the div.footnote exists, we can get its normal position, etc:
@@ -107,16 +108,16 @@ function grantnotes(arText, footbar){
 			var prev_bottom = 0;
 			var note_count = 1;
 			var noteArray = new Array(); // An array for storing the footnote objects
-			//var arText = $('article.main-article');
+			//var arText = jQuery('article.main-article');
 			var article = new article(arText); // create the article object
 
 			// For each <sup> create a new fNote object
 			arText.find('sup').each(function(){
-				var ref = $(this);
-				//var fBar = $('.footnote-bar');
+				var ref = jQuery(this);
+				//var fBar = jQuery('.footnote-bar');
 				var footnote = new fNote(ref, arText, footbar, note_count);
 				noteArray.push(footnote);
-				$('.footnote').css('visibility', 'visible');
+				jQuery('.footnote').css('visibility', 'visible');
 				note_count = note_count + 1;
 			});
 

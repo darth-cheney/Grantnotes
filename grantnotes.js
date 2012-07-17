@@ -124,7 +124,7 @@ function grantnotes(arText, footbar){
 			// Go through the noteArray and position the footnotes correctly
 			for (var i = 0; i < noteArray.length; i++) {
 				var footnote = noteArray[i];
-				var ref_pos = footnote.refPosition();
+				var ref_pos = footnote.refAbsPosition() - footbar.offset().top;
 				if(ref_pos < prev_bottom){
 					footnote.setPosition(prev_bottom - footnote.normal_pos);
 				} else {

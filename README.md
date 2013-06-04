@@ -15,6 +15,11 @@ $(document).ready(function(){<br/>
 });
 </code>
 <br/>
+<b><u>Arguments</u></b>
+<code>
+	grantnotes(main_text, footnote_bar, optionalArguments, callback)
+</code>	
+<br/>
 <br/>
 <b>Requirements</b><br/>
 The <code>article</code> or <code>div</code> containing the main text should have within it one or more <code>sup</code> elements. Under default settings, it should also 
@@ -36,3 +41,7 @@ Because this sort of footnoting (surprisingly) requires more JavaScript-fu than 
 <br/><br/>
 Grantnotes also makes use of a smaller <code>article</code> object, which stores metrics about the size and offset of the main-text article. One of the reasons that these objects are necessary is because the article/main-text division and the footnote-bar division need not start at the same height on the page. In other words, if one wanted to float a block of ads to the right of the main-text, and then the footnote-bar underneath those ads, grantnotes knows to take this into consideration, and will render the first footnotes underneath those ads instead of a position horizontally aligned with the actual first <code>sup</code>. The provided file <b>example2.html</b> provides a straightforward example of this.<br/><br/>
 Each <code>Footnote</code> is initialized and a fresh <code>.footnote</code> element is created for each and then displayed. Each <code>Footnote</code> is subsequently placed into an array and stored with all of the other <code>Footnote</code> objects. The script then cycles through these, making use of specific measurement methods (which are also jQuery reliant) to ascertain the old and new positions of each element.
+<br/>
+<br/>
+<h4>Optional Arguments</h4>
+Optional arguments should be coming in the future

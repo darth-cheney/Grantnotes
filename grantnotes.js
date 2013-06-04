@@ -146,11 +146,10 @@ var grantnotes = function(text, footbar, optArgs) {
 	});
 	
 	// Bind the positioning function to any window resizing
+	/* NEEDS TO BE FIXED 
 	$(window).resize(function() {
 		this.positionFootnotes(noteArray, footbar_offset);
-	});
+	}); */
 
-	// Call the window resize once just to clear out any weird formatting errors that HAVE BEEN cropping up (TODO)
-	//$(window).trigger('resize');
 
 }	

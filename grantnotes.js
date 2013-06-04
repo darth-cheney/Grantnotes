@@ -1,5 +1,7 @@
-/*********************
- *     Grantnotes    *
+
+
+ /*********************
+ *   Grantnotes 2.0  *
  *        ECMG       *
  *********************/
 
@@ -12,128 +14,143 @@
 // GNU General Public License for more details.
 
 
-/* jQuery(document).ready(function(){
-	grantnotes(jQuery('article.main-article'), jQuery('.footnote-bar')); // Our example call to the overall function.		
-}); */
 
+var grantnotes = function(text, footbar, optArgs) {
+	if(optArgs) {
+		if (optArgs.breakpoint) {
+			var breakpoint = optArgs.breakpoint;
+		}
+		if (optArgs.breakpoint_action) {
+			var breakpoint_action = optArgs.breakpoint_action;
+		}
+		if (optArgs.animate) {
+			var animate = true;
+		}
+		if (typeof(optArgs.note_container == "object")) {
+			var note_container = optArgs.note_container;
+		} else if (optArgs.note_container == "string") {
+			var note_container = $(optArgs.note_container);
+		}
+		if (optArgs.ref_id) {
+			var refID = optArgs.ref_id;
+		}
+		if (optArgs.foot_id) {
+			var footID = optArgs.foot_id;
+		}
+	}
 
+	function Footnote(reference, text, footbar, note_count) {
 
-// The overall script
-function grantnotes(arText, footbar){
+		// Constructed variables
+		this.number = note_count;
+		this.refID = 'ref' + note_count;
+		this.footID = 'foot' + note_count;
+		this.reference = reference;
+
+		// Make changes to the in-text <sup> elements.
+		// If a number exists within the <sup>, use it. Otherwise make one automagically
+		var note_char;
+		if(!reference.text()) {
+			note_char = this.number;
+		} else {
+			note_char = reference.text();
+			reference.text('');
+		};
+		reference.prepend('<a href="#' + this.footID + '">' + note_char + '</a>');
+
+		// Find the footnote text and create a .footnote div
+		footbar.append($('<div class="footnote" id="' + this.footID + '"></div>'));
+		this.element = $('div#' + this.footID + '.footnote'); // a jQuery object representing the newly created div.footnote
+		this.element.append($('<sup>' + note_char + '</sup>'));
+		this.element.append(text.find('span.footnote-text').filter(':first'));
 		
-		// Prototype for the fNote object
-		function fNote(ref, arText, fBar, note_count) {
-			
-			// Set construction actions and constructed variables
-			this.number = note_count;
-			this.refID =  'ref' + note_count;
-			this.noteID = 'foot' + note_count;
-			this.bar_offset = fBar.offset().top;
+		// Make the footnote absolutely positioned, and also hide it
+		this.element.css({
+			position: 'absolute',
+			opacity: '0'
+		});
 
-			// Make changes to the in-text <sup> elements
-			var note_char;
-			if(!ref.text()){
-				note_char = this.number;
+
+		// Methods
+		this.getHeight = function() { // returns calculated height of footnote div
+			return this.element.outerHeight(true);
+		};
+
+		this.refAbsPosition = function() { // returns pos of in-text ref relative to document
+			return this.reference.offset().top;
+		};
+
+		this.barPosition = function() { // returns the position of footnote div relative to footbar
+			return this.element.position().top;
+		};
+
+		this.setPosition = function(num) {
+			this.element.css('top', num + 'px');
+		};
+
+		this.getBottom = function() {
+			return this.barPosition() + this.getHeight();
+		};
+
+	}
+
+	function getFootbarOffset() {
+		return footbar.offset().top;
+	}
+
+	this.positionFootnotes = function(noteArray, footbar_offset) {
+		// Loop through the array of footnotes and position them appropriately
+		var notes_length = noteArray.length;
+		for (var i = 0; i < notes_length; i ++) {
+			var footnote = noteArray[i];
+			var ref_pos = footnote.refAbsPosition();
+			var total_offset = ref_pos - footbar_offset;
+			if(total_offset >= 0 && total_offset > prev_bottom) {
+				footnote.setPosition(total_offset);
+			} else if (total_offset <= prev_bottom) {
+				footnote.setPosition(prev_bottom + 10); // +10 for some padding
 			} else {
-				note_char = ref.text();
-			};
-			ref.prepend('<a href="#' + this.noteID + '">' + note_char + '</a>');
+				footnote.setPosition(0);
+			}
 
+			prev_bottom = footnote.getBottom();
+			footnote.element.animate({
+				opacity: '1'
+			}, 400);
 
-			// Find the footnote text and create a .footnote div
-			fBar.append(jQuery('<div class="footnote" id="' + this.noteID + '"></div>'));
-			this.element = jQuery('div#' + this.noteID + '.footnote'); // a jQuery object representing the newly created div.footnote
-			this.element.append(jQuery('<sup>' + note_char + '</sup>'));
-			this.element.append(arText.find('span.footnote-text').filter(':first'));
+		}
+	}
 
-			// Now that the div.footnote exists, we can get its normal position, etc:
-			this.normal_pos = this.element.position().top;
+	// Main
+	var note_count = 1;
+	var prev_bottom = 0; // Updates with bottom of the previous footnote when looping.
+	var noteArray = new Array(); // An array to store the notes as we create them
+	var footbar_offset = getFootbarOffset();
 
-			// fNote methods
-			this.getHeight = function(){ // returns the calculated height of the footnote div
-				return this.element.outerHeight(true);
-			};
+	// Make sure that footbar is explicitly set to relative positioning
+	footbar.css('position', 'relative');
 
-			this.docPosition = function(){ // returns the position of the top of the element relative to the whole document
-				return this.element.offset().top;
-			};
+	// Find each <sup> within the text and create a new Footnote for each
+	text.find('sup').each(function(){
+		var reference = $(this);
+		var footnote = new Footnote(reference, text, footbar, note_count);
+		noteArray.push(footnote);
+		note_count = note_count + 1;
+	});
+	
+	// This delay helps smooth over browser inconsistencies in loading/rendering (needs work)
+	$(window).load(function(){
+		setTimeout(function(){
+			this.positionFootnotes(noteArray, footbar_offset);
+		}, 200);
+	});
+	
+	// Bind the positioning function to any window resizing
+	$(window).resize(function() {
+		this.positionFootnotes(noteArray, footbar_offset);
+	});
 
-			this.barPosition = function(){ // returns the position of the top of the element relative to the footnote-bar
-				return this.element.position().top;
-			};
+	// Call the window resize once just to clear out any weird formatting errors that HAVE BEEN cropping up (TODO)
+	//$(window).trigger('resize');
 
-			this.getBottom = function(){ // returns the position of the element bottom relative to the footnote-bar
-				return (this.barPosition() + this.getHeight());
-			};
-
-			this.getAbsBottom = function(){ // returns the position of the element bottom relative to the whole page
-				return (this.docPosition() + this.getHeight());
-			};
-
-			this.refPosition = function(){ // returns the position of the <sup> in arText transposed for the footnote-bar
-				return ref.offset().top - this.bar_offset;
-			};
-
-			this.refAbsPosition = function(){ // returns the absolute position of the main text reference relative to whole document
-				return ref.offset().top;
-			};
-
-			this.setPosition = function(num){ // sets the CSS: top value for the footnote element.
-				this.element.css('top', num);
-			};
-
-			this.isSequential = function(){ // returns boolean of whether or not this reference used a number as its symbol
-				return this.number == note_char;
-			};
-		};
-		//prototype for the article object
-		function article(arText) {
-			this.offset = arText.offset().top;
-			this.height = arText.height();
-			this.absHeight = this.offset + this.height;
-			this.element = arText;
-		};
-		// A generic transponsition function	
-			//DO THIS LATER
-
-		function bottomAdjust(footnote) {
-			footnote.element.appendTo(article.element);
-			footnote.element.css('position', 'static');
-			footnote.element.css('width', '100%');
-			footnote.element.css('border-top', '3px solid rgba(0, 0, 0, 0.3)');
-			footnote.element.css('padding-top', '7px');
-		};
-
-			// Main
-			var prev_bottom = 0;
-			var note_count = 1;
-			var noteArray = new Array(); // An array for storing the footnote objects
-			//var arText = jQuery('article.main-article');
-			var article = new article(arText); // create the article object
-
-			// For each <sup> create a new fNote object
-			arText.find('sup').each(function(){
-				var ref = jQuery(this);
-				//var fBar = jQuery('.footnote-bar');
-				var footnote = new fNote(ref, arText, footbar, note_count);
-				noteArray.push(footnote);
-				jQuery('.footnote').css('visibility', 'visible');
-				note_count = note_count + 1;
-			});
-
-			// Go through the noteArray and position the footnotes correctly
-			for (var i = 0; i < noteArray.length; i++) {
-				var footnote = noteArray[i];
-				var ref_pos = footnote.refAbsPosition() - footbar.offset().top;
-				if(ref_pos < prev_bottom){
-					footnote.setPosition(prev_bottom - footnote.normal_pos);
-				} else {
-					footnote.setPosition(ref_pos - footnote.normal_pos);
-				};
-				prev_bottom = footnote.getBottom();
-				if((article.height - footnote.refPosition()) < footnote.getHeight()) {
-					console.log('Overrun: true');
-					bottomAdjust(footnote);
-				};
-			};
-	};
+}	

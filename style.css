@@ -36,6 +36,15 @@ sup {
 	font-size: 0.6em;
 	vertical-align: top;
 	color: red;
+	margin-bottom: 3px;
+	margin-right: 3px;
+}
+
+sup a, sup a:hover, sup a:active, sup a:visited {
+	font-size: 0.7em;
+	text-decoration: none;
+	vertical-align: top;
+	color: red;
 }
 
 .footnote-text {
@@ -93,7 +102,6 @@ body {
 	width: 150px;
 	display: block;
 	position: relative;
-	visibility: hidden;
 	padding-top: 3px;
 	text-align: justify;
 }
